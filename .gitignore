@@ -1,0 +1,25 @@
+# IntelliJ IDEA files
+.idea/
+*.iml
+
+# Java build outputs (if not using Maven or Gradle)
+out/
+target/
+
+# IDE-specific temporary files
+*.log
+*.class
+*.jar
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore compiled files (from Swing and Java)
+*.class
+
+# If you are using JDK 9 or later (module system)
+.modules/
+
+# If you're using JavaFX, this might be relevant too
+*.javafx
