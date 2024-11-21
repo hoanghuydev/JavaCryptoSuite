@@ -6,12 +6,10 @@
 package com.raven.main;
 
 import com.raven.event.EventMenuSelected;
-import com.raven.form.Form_1;
-import com.raven.form.Form_2;
-import com.raven.form.Form_3;
-import com.raven.form.Form_Home;
-import java.awt.Color;
-import javax.swing.JComponent;
+import com.raven.form.*;
+
+import java.awt.*;
+import javax.swing.*;
 
 /**
  *
@@ -22,37 +20,55 @@ public class Main extends javax.swing.JFrame {
     /**
      * Creates new form Main
      */
-    private Form_Home home;
-    private Form_1 form1;
-    private Form_2 form2;
-    private Form_3 form3;
+    private JComponent symmetricForm;
+    private JComponent asymmetricFrom;
+    private JComponent hashForm;
+    private JComponent signatureForm;
+    private JComponent basicCipherForm;
+
 
     public Main() {
         initComponents();
+        setAppIcon();
         setBackground(new Color(0, 0, 0, 0));
-        home = new Form_Home();
-        form1 = new Form_1();
-        form2 = new Form_2();
-        form3 = new Form_3();
+        symmetricForm = new SymmetricForm().getPanel();
+        basicCipherForm = new BasicCipherForm().getPanel();
+        asymmetricFrom = new AsymmetricForm().getPanel();
+        hashForm = new HashForm().getPanel();
+        signatureForm = new SignatureForm().getPanel();
+
         menu.initMoving(Main.this);
         menu.addEventMenuSelected(new EventMenuSelected() {
             @Override
             public void selected(int index) {
-                if (index == 0) {
-                    setForm(home);
-                } else if (index == 1) {
-                    setForm(form1);
-                } else if (index == 2) {
-                    setForm(form2);
-                } else if (index == 3) {
-                    setForm(form3);
+                switch (index) {
+                    case 0:
+                        setForm(basicCipherForm);
+                        break;
+                    case 1:
+                        setForm(symmetricForm);
+                        break;
+                    case 2:
+                        setForm(asymmetricFrom);
+                        break;
+                    case 3:
+                        setForm(hashForm);
+                        break;
+                    case 4:
+                        setForm(signatureForm);
+                        break;
                 }
             }
         });
         //  set when system open start with home form
-        setForm(new Form_Home());
+        setForm(new BasicCipherForm().getPanel());
     }
 
+    private void setAppIcon() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("/com/raven/icon/logo.png"));
+        Image image = icon.getImage();
+        setIconImage(image);
+    }
     private void setForm(JComponent com) {
         mainPanel.removeAll();
         mainPanel.add(com);

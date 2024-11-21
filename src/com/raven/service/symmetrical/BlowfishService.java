@@ -83,8 +83,8 @@ public class BlowfishService implements ISymmetricCipher {
         if (transformation.contains("ECB")) cipher.init(Cipher.DECRYPT_MODE, key);
         else cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[8]));
 
-        var encrypted_text_bytes = Base64.getDecoder().decode(text);
-        var decrypted_text_bytes = cipher.doFinal(encrypted_text_bytes);
+        byte[] encrypted_text_bytes = Base64.getDecoder().decode(text);
+        byte[] decrypted_text_bytes = cipher.doFinal(encrypted_text_bytes);
         return new String(decrypted_text_bytes,"UTF-8");
     }
 
