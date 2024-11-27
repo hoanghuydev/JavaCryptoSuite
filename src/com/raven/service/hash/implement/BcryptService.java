@@ -1,4 +1,4 @@
-package com.raven.service.hash;
+package com.raven.service.hash.implement;
 
 import org.mindrot.jbcrypt.BCrypt;
 

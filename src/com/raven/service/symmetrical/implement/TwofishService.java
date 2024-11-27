@@ -1,7 +1,4 @@
-package com.raven.service.symmetrical;
-
-import com.raven.service.symmetrical.implement.ISymmetricCipher;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+package com.raven.service.symmetrical.implement;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -14,7 +11,10 @@ import java.io.FileOutputStream;
 import java.security.Security;
 import java.util.Base64;
 
-public class SerpentService implements ISymmetricCipher {
+import com.raven.service.symmetrical.ISymmetricCipher;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+public class TwofishService implements ISymmetricCipher {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -23,14 +23,11 @@ public class SerpentService implements ISymmetricCipher {
 
     @Override
     public SecretKey generateSecretKey(int length) throws Exception {
-
-        KeyGenerator key_generator = KeyGenerator.getInstance("Serpent","BC");
-        key_generator.init(length); // Độ dài của khóa (128,192 hoặc 256 bit)
+        KeyGenerator key_generator = KeyGenerator.getInstance("TwoFish","BC");
+        key_generator.init(length);
         key = key_generator.generateKey();
         return key;
     }
-
-
 
     @Override
     public String encryptToBase64(String text) throws Exception {
@@ -59,20 +56,20 @@ public class SerpentService implements ISymmetricCipher {
                 byte[] input_byte = new byte[1024];
                 int bytes_read;
                 while ((bytes_read = fis.read(input_byte)) != -1) {
-
                     byte[] output_byte = cipher.update(input_byte, 0, bytes_read);
                     if (output_byte != null) fos.write(output_byte);
-
                 }
                 byte[] output = cipher.doFinal();
                 if (output != null) fos.write(output);
                 fos.flush();
                 System.out.println("Mã hóa file thành công");
+
             }
         } finally {
             if (fis != null) fis.close();
             if (fos != null) fos.close();
         }
+
     }
 
     @Override
@@ -108,6 +105,7 @@ public class SerpentService implements ISymmetricCipher {
                 if (output != null) fos.write(output);
                 fos.flush();
                 System.out.println("Giải mã file thành công");
+
             }
         } finally {
 
@@ -132,7 +130,7 @@ public class SerpentService implements ISymmetricCipher {
 
         try {
             byte[] keyBytes = Base64.getDecoder().decode(keyText);
-            SecretKey importedKey = new SecretKeySpec(keyBytes, "Serpent");
+            SecretKey importedKey = new SecretKeySpec(keyBytes, "TwoFish");
             this.key = importedKey;
             return importedKey;
         } catch (Exception e) {
@@ -140,24 +138,26 @@ public class SerpentService implements ISymmetricCipher {
         }
     }
 
+    public SecretKey getKey() {
+        return key;
+    }
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
 
     public static void main(String[] args) throws Exception {
-        String plain_text = "Thử mã hóa Serpent";
-        SerpentService serpent = new SerpentService();
-        serpent.setTransformation("Serpent/CBC/PKCS5Padding");
-        serpent.generateSecretKey(128);
-        String encrypt_text = serpent.encryptToBase64(plain_text);
-        System.out.println("Key: " + serpent.exportKey());
-        System.out.println("------------------------------------");
+        String plain_text = "Thử mã hóa Twofish";
+        TwofishService twoFish = new TwofishService();
+        twoFish.setTransformation("TwoFish/CBC/PKCS5Padding");
+        twoFish.generateSecretKey(128);
+        String encrypt_text = twoFish.encryptToBase64(plain_text);
+        System.out.println("Key: " + twoFish.exportKey());
         System.out.println("Encrypt To Base64: " + encrypt_text);
-        System.out.println(serpent.decryptFromBase64(encrypt_text));
+        System.out.println(twoFish.decryptFromBase64(encrypt_text));
         String srcFileEncrypt = "E:\\Dowload\\testMaHoa.json";
         String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
         String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";
-        serpent.encryptFile(srcFileEncrypt, destFileEncrypt);
-        serpent.decryptFile(destFileEncrypt, destFileDecrypt);
+        twoFish.encryptFile(srcFileEncrypt, destFileEncrypt);
+        twoFish.decryptFile(destFileEncrypt, destFileDecrypt);
     }
 }

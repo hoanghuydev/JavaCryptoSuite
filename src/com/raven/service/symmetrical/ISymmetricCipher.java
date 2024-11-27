@@ -1,4 +1,4 @@
-package com.raven.service.symmetrical.implement;
+package com.raven.service.symmetrical;
 
 import javax.crypto.SecretKey;
 

@@ -1,4 +1,4 @@
-package com.raven.form;
+package com.raven.form.symmetric;
 
 import javax.swing.*;
 import java.awt.*;

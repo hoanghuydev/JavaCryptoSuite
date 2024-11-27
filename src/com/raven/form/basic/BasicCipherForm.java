@@ -1,11 +1,11 @@
-package com.raven.form;
+package com.raven.form.basic;
+
+import com.raven.controller.BasicCipherController;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class BasicCipherForm {
     private JPanel panel;
@@ -17,9 +17,11 @@ public class BasicCipherForm {
     private JLabel titleLabel;
     private JLabel inputLabel;
     private JLabel outputLabel;
-    private boolean isEncryptMode = true;
+
+    private BasicCipherController controller;
 
     public BasicCipherForm() {
+        controller = new BasicCipherController(this);
         initializeComponents();
         setupLayout();
         setupEventListeners();
@@ -59,11 +61,11 @@ public class BasicCipherForm {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Draw rounded background
+                // Vẽ nền bo tròn
                 g2d.setColor(getBackground());
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
 
-                // Draw text
+                // Vẽ văn bản
                 super.paintComponent(g2d);
                 g2d.dispose();
             }
@@ -91,7 +93,7 @@ public class BasicCipherForm {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Create shadow effect
+                // Tạo hiệu ứng bóng đổ
                 int shadowSize = 4;
                 int shadowOffset = 2;
                 for (int i = 0; i < shadowSize; i++) {
@@ -106,7 +108,7 @@ public class BasicCipherForm {
                     );
                 }
 
-                // Draw main background
+                // Vẽ nền chính
                 g2d.setColor(getBackground());
                 g2d.fillRoundRect(0, 0, getWidth() - shadowSize, getHeight() - shadowSize, 15, 15);
 
@@ -116,18 +118,18 @@ public class BasicCipherForm {
 
             @Override
             public Insets getInsets() {
-                // Add extra padding to account for shadow
+                // Thêm khoảng đệm để tính đến bóng đổ
                 return new Insets(5, 5, 9, 9);
             }
         };
 
-        // Custom rounded border
+        // Viền bo tròn tùy chỉnh
         scrollPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setBackground(Color.WHITE);
 
-        // Customize scrollbar appearance
+        // Tùy chỉnh thanh cuộn
         JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
         verticalScrollBar.setPreferredSize(new Dimension(12, 0));
         verticalScrollBar.setUI(new BasicScrollBarUI() {
@@ -157,20 +159,6 @@ public class BasicCipherForm {
         return scrollPane;
     }
 
-    // Thêm helper method để tạo panel chứa
-    private JPanel createShadowPanel(JComponent component) {
-        JPanel panel = new JPanel(new BorderLayout()) {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension size = super.getPreferredSize();
-                // Add extra space for shadow
-                return new Dimension(size.width + 10, size.height + 10);
-            }
-        };
-        panel.setOpaque(false);
-        panel.add(component, BorderLayout.CENTER);
-        return panel;
-    }
     private JButton createStyledButton(String text, String tooltip) {
         JButton button = new JButton(text);
         button.setFocusPainted(false);
@@ -179,25 +167,39 @@ public class BasicCipherForm {
         return button;
     }
 
+    private JPanel createShadowPanel(JComponent component) {
+        JPanel panel = new JPanel(new BorderLayout()) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension size = super.getPreferredSize();
+                // Thêm không gian cho bóng đổ
+                return new Dimension(size.width + 10, size.height + 10);
+            }
+        };
+        panel.setOpaque(false);
+        panel.add(component, BorderLayout.CENTER);
+        return panel;
+    }
+
     private void setupLayout() {
         panel.setLayout(new BorderLayout(10, 10));
         panel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // Title Panel
+        // Panel tiêu đề
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titlePanel.setBackground(new Color(245, 245, 250));
         titleLabel.setFont(new Font("Segoe UI Emoji", Font.BOLD, 24));
         titleLabel.setForeground(new Color(50, 50, 50));
         titlePanel.add(titleLabel);
 
-        // Main Content Panel
+        // Panel nội dung chính
         JPanel contentPanel = new JPanel(new GridBagLayout());
         contentPanel.setBackground(new Color(245, 245, 250));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.BOTH;
 
-        // Left Text Area with Label
+        // Text Area bên trái với Label
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
@@ -215,27 +217,27 @@ public class BasicCipherForm {
         JScrollPane leftScroll = createStyledScrollPane(inputTextArea);
         contentPanel.add(leftScroll, gbc);
 
-        // Center Controls
+        // Các nút điều khiển ở giữa
         JPanel centerPanel = new JPanel(new GridBagLayout());
         centerPanel.setBackground(new Color(245, 245, 250));
         GridBagConstraints centerGbc = new GridBagConstraints();
         centerGbc.insets = new Insets(5, 5, 5, 5);
         centerGbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Algorithm Combo Box
+        // Combo Box chọn thuật toán
         centerGbc.gridx = 0;
         centerGbc.gridy = 0;
         centerGbc.weightx = 1.0;
         algorithmComboBox.setPreferredSize(new Dimension(200, 35));
         centerPanel.add(algorithmComboBox, centerGbc);
 
-        // Mode Toggle Button
+        // Nút Toggle chế độ mã hóa/giải mã
         centerGbc.gridy = 1;
         modeToggleButton.setPreferredSize(new Dimension(200, 35));
         styleToggleButton(modeToggleButton);
         centerPanel.add(modeToggleButton, centerGbc);
 
-        // Execute Button
+        // Nút thực thi
         centerGbc.gridy = 2;
         executeButton.setPreferredSize(new Dimension(200, 35));
         centerPanel.add(executeButton, centerGbc);
@@ -247,7 +249,7 @@ public class BasicCipherForm {
         gbc.weightx = 0.2;
         contentPanel.add(centerPanel, gbc);
 
-        // Right Text Area with Label
+        // Text Area bên phải với Label
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridheight = 1;
@@ -265,11 +267,10 @@ public class BasicCipherForm {
         JScrollPane rightScroll = createStyledScrollPane(outputTextArea);
         contentPanel.add(rightScroll, gbc);
 
-        // Add all panels to main panel
+        // Thêm tất cả các panel vào panel chính
         panel.add(titlePanel, BorderLayout.NORTH);
         panel.add(contentPanel, BorderLayout.CENTER);
     }
-
 
     private void styleToggleButton(JToggleButton button) {
         button.setFont(new Font("Segoe UI Emoji", Font.BOLD, 14));
@@ -277,8 +278,8 @@ public class BasicCipherForm {
         updateToggleButtonStyle();
     }
 
-    private void updateToggleButtonStyle() {
-        if (isEncryptMode) {
+    void updateToggleButtonStyle() {
+        if (controller.isEncryptMode()) {
             modeToggleButton.setBackground(new Color(70, 130, 180));
             modeToggleButton.setForeground(Color.WHITE);
             modeToggleButton.setText("🔒 Encrypt Mode");
@@ -290,18 +291,18 @@ public class BasicCipherForm {
     }
 
     private void applyStyles() {
-        // Combo Box Styling
+        // Tùy chỉnh Combo Box
         algorithmComboBox.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 14));
         algorithmComboBox.setBackground(Color.WHITE);
 
-        // Execute Button Styling
+        // Tùy chỉnh Nút Execute
         Color buttonColor = new Color(70, 130, 180);
         executeButton.setBackground(buttonColor);
         executeButton.setForeground(Color.WHITE);
     }
 
-    private void updateLabels() {
-        if (isEncryptMode) {
+    void updateLabels() {
+        if (controller.isEncryptMode()) {
             inputLabel.setText("Plain Text");
             outputLabel.setText("Encrypted Text");
         } else {
@@ -312,44 +313,31 @@ public class BasicCipherForm {
 
     private void setupEventListeners() {
         modeToggleButton.addActionListener(e -> {
-            isEncryptMode = !isEncryptMode;
+            controller.toggleMode();
             updateToggleButtonStyle();
             updateLabels();
         });
 
-        executeButton.addActionListener(e -> executeOperation());
-    }
-
-    private void executeOperation() {
-        String algorithm = (String) algorithmComboBox.getSelectedItem();
-        String inputText = inputTextArea.getText();
-
-        // Here you would implement the actual encryption/decryption logic
-        String operation = isEncryptMode ? "encrypted" : "decrypted";
-        String result = String.format("Text %s with %s: %s", operation, algorithm, inputText);
-        outputTextArea.setText(result);
+        executeButton.addActionListener(e -> controller.executeOperation());
     }
 
     public JPanel getPanel() {
         return panel;
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public String getSelectedAlgorithm() {
+        return (String) algorithmComboBox.getSelectedItem();
+    }
 
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Basic Cipher Tool");
-            BasicCipherForm basicCipherForm = new BasicCipherForm();
-            frame.setContentPane(basicCipherForm.getPanel());
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.pack();
-            frame.setSize(1000, 600);
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-        });
+    public String getInputText() {
+        return inputTextArea.getText();
+    }
+
+    public void setOutputText(String text) {
+        outputTextArea.setText(text);
+    }
+
+    public boolean isEncryptMode() {
+        return controller.isEncryptMode();
     }
 }

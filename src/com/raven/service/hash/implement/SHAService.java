@@ -1,13 +1,13 @@
-package com.raven.service.hash;
+package com.raven.service.hash.implement;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5Service {
+public class SHAService {
     public String hash(String input) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(input.getBytes());
-        byte[] digest = md.digest();
+        MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
+        sha256.update(input.getBytes());
+        byte[] digest = sha256.digest();
         StringBuilder hexString = new StringBuilder();
         for (byte b : digest) {
             hexString.append(String.format("%02x", b));
@@ -21,14 +21,12 @@ public class MD5Service {
 
     public static void main(String[] args) {
         try {
-            MD5Service md5Service = new MD5Service();
+            SHAService shaService = new SHAService();
             String input = "mySecurePassword";
-            String hashedValue = md5Service.hash(input);
-            System.out.println("MD5 Hash of \"" + input + "\": " + hashedValue);
-            boolean isMatch = md5Service.check(input, hashedValue);
+            String hashedValue = shaService.hash(input);
+            System.out.println("SHA-256 Hash of \"" + input + "\": " + hashedValue);
+            boolean isMatch = shaService.check(input, hashedValue);
             System.out.println("Does the input match the hash? " + isMatch);
-            boolean isMatchWrong = md5Service.check("wrongPassword", hashedValue);
-            System.out.println("Does the wrong input match the hash? " + isMatchWrong);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

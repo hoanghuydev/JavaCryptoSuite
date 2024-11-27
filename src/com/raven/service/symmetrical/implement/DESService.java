@@ -1,6 +1,6 @@
-package com.raven.service.symmetrical;
+package com.raven.service.symmetrical.implement;
 
-import com.raven.service.symmetrical.implement.ISymmetricCipher;
+import com.raven.service.symmetrical.ISymmetricCipher;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -10,20 +10,14 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.security.Security;
 import java.util.Base64;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class TwofishService implements ISymmetricCipher {
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
+public class DESService implements ISymmetricCipher {
     private SecretKey key;
     private String transformation;
-
     @Override
     public SecretKey generateSecretKey(int length) throws Exception {
-        KeyGenerator key_generator = KeyGenerator.getInstance("TwoFish","BC");
+        KeyGenerator key_generator = KeyGenerator.getInstance("DES");
         key_generator.init(length);
         key = key_generator.generateKey();
         return key;
@@ -33,8 +27,10 @@ public class TwofishService implements ISymmetricCipher {
     public String encryptToBase64(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
+
         if (transformation.contains("ECB")) cipher.init(Cipher.ENCRYPT_MODE, key);
-        else cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+        else cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[8]));
+
         var text_bytes = text.getBytes("UTF-8");
         var encrypted_text_bytes = cipher.doFinal(text_bytes);
         return Base64.getEncoder().encodeToString(encrypted_text_bytes);
@@ -50,7 +46,7 @@ public class TwofishService implements ISymmetricCipher {
             if (fileSrc.isFile()) {
                 Cipher cipher = Cipher.getInstance(transformation);
                 if (transformation.contains("ECB")) cipher.init(Cipher.ENCRYPT_MODE, key);
-                else cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+                else cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[8]));
                 fis = new FileInputStream(fileSrc);
                 fos = new FileOutputStream(destFile);
                 byte[] input_byte = new byte[1024];
@@ -63,7 +59,6 @@ public class TwofishService implements ISymmetricCipher {
                 if (output != null) fos.write(output);
                 fos.flush();
                 System.out.println("Mã hóa file thành công");
-
             }
         } finally {
             if (fis != null) fis.close();
@@ -76,8 +71,10 @@ public class TwofishService implements ISymmetricCipher {
     public String decryptFromBase64(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
+
         if (transformation.contains("ECB")) cipher.init(Cipher.DECRYPT_MODE, key);
-        else cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+        else cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[8]));
+
         var plain_text = cipher.doFinal(Base64.getDecoder().decode(text));
         return new String(plain_text, "UTF-8");
     }
@@ -87,12 +84,12 @@ public class TwofishService implements ISymmetricCipher {
         FileInputStream fis = null;
         FileOutputStream fos = null;
         try {
-            if (key == null) throw new Exception("Key Not Found");
+            if (key == null) throw new Exception("Không tìm thấy khóa");
             File fileSrc = new File(srcFile);
             if (fileSrc.isFile()) {
                 Cipher cipher = Cipher.getInstance(transformation);
                 if (transformation.contains("ECB")) cipher.init(Cipher.DECRYPT_MODE, key);
-                else cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+                else cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[8]));
                 fis = new FileInputStream(fileSrc);
                 fos = new FileOutputStream(destFile);
                 byte[] input_byte = new byte[1024];
@@ -105,10 +102,8 @@ public class TwofishService implements ISymmetricCipher {
                 if (output != null) fos.write(output);
                 fos.flush();
                 System.out.println("Giải mã file thành công");
-
             }
         } finally {
-
             if (fis != null) fis.close();
             if (fos != null) fos.close();
         }
@@ -123,41 +118,36 @@ public class TwofishService implements ISymmetricCipher {
 
     @Override
     public SecretKey importKey(String keyText) throws Exception {
-
         if (keyText == null || keyText.isEmpty()) {
             throw new IllegalArgumentException("Invalid key text");
         }
-
         try {
             byte[] keyBytes = Base64.getDecoder().decode(keyText);
-            SecretKey importedKey = new SecretKeySpec(keyBytes, "TwoFish");
+            SecretKey importedKey = new SecretKeySpec(keyBytes, "DES");
             this.key = importedKey;
             return importedKey;
         } catch (Exception e) {
-            throw new Exception("Failed to import key: " + e.getMessage());
+            throw new Exception(e.getMessage());
         }
     }
 
-    public SecretKey getKey() {
-        return key;
-    }
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
 
     public static void main(String[] args) throws Exception {
-        String plain_text = "Thử mã hóa Twofish";
-        TwofishService twoFish = new TwofishService();
-        twoFish.setTransformation("TwoFish/CBC/PKCS5Padding");
-        twoFish.generateSecretKey(128);
-        String encrypt_text = twoFish.encryptToBase64(plain_text);
-        System.out.println("Key: " + twoFish.exportKey());
+        String plain_text = "Thử code mã hóa DES";
+        DESService des = new DESService();
+        des.setTransformation("DES/CBC/PKCS5Padding");
+        des.generateSecretKey(56);
+        String encrypt_text = des.encryptToBase64(plain_text);
+        System.out.println("Key: " + des.exportKey());
         System.out.println("Encrypt To Base64: " + encrypt_text);
-        System.out.println(twoFish.decryptFromBase64(encrypt_text));
+        System.out.println(des.decryptFromBase64(encrypt_text));
         String srcFileEncrypt = "E:\\Dowload\\testMaHoa.json";
         String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
         String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";
-        twoFish.encryptFile(srcFileEncrypt, destFileEncrypt);
-        twoFish.decryptFile(destFileEncrypt, destFileDecrypt);
+        des.encryptFile(srcFileEncrypt, destFileEncrypt);
+        des.decryptFile(destFileEncrypt, destFileDecrypt);
     }
 }

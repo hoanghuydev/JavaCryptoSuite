@@ -6,7 +6,11 @@
 package com.raven.main;
 
 import com.raven.event.EventMenuSelected;
-import com.raven.form.*;
+import com.raven.form.asymmetric.AsymmetricForm;
+import com.raven.form.basic.BasicCipherForm;
+import com.raven.form.hash.HashForm;
+import com.raven.form.signature.SignatureForm;
+import com.raven.form.symmetric.SymmetricForm;
 
 import java.awt.*;
 import javax.swing.*;

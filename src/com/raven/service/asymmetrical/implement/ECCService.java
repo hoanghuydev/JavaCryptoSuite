@@ -1,4 +1,7 @@
-package com.raven.service.asymmetrical;
+package com.raven.service.asymmetrical.implement;
+
+import com.raven.service.asymmetrical.IAsymmetricService;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -7,27 +10,35 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
+import java.security.interfaces.ECPrivateKey;
+import java.security.interfaces.ECPublicKey;
+import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-public class RSAService {
+public class ECCService implements IAsymmetricService {
     private KeyPair keyPair;
-    private PublicKey publicKey;
-    private PrivateKey privateKey;
+    private ECPublicKey publicKey;
+    private ECPrivateKey privateKey;
 
-    // Tạo cặp khóa RSA (public và private)
-    public void generateKey(int length) throws Exception {
-        KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance("RSA");
-        keyGenerator.initialize(length);  // 2048 bits là tiêu chuẩn
-        keyPair = keyGenerator.generateKeyPair();
-        publicKey = keyPair.getPublic();
-        privateKey = keyPair.getPrivate();
+    static {
+        Security.addProvider(new BouncyCastleProvider()); // Thêm BouncyCastle vào Java Security Provider
     }
 
-    // Mã hóa chuỗi và chuyển sang Base64
-    public String encryptToBase64(String text, String transformation) throws Exception {
+    // Tạo cặp khóa ECC (public và private)
+    @Override
+    public void generateKey(int length) throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
+        keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1")); // SECP256r1 là đường cong elliptic phổ biến
+        keyPair = keyPairGenerator.generateKeyPair();
+        publicKey = (ECPublicKey) keyPair.getPublic();
+        privateKey = (ECPrivateKey) keyPair.getPrivate();
+    }
+
+    @Override
+    public String encrypt(String text, String transformation) throws Exception {
         if (publicKey == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -35,8 +46,8 @@ public class RSAService {
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
-    // Giải mã từ Base64
-    public String decryptFromBase64(String encrypted, String transformation) throws Exception {
+    @Override
+    public String decrypt(String encrypted, String transformation) throws Exception {
         if (privateKey == null) return "";
         byte[] encryptedBytes = Base64.getDecoder().decode(encrypted);
         Cipher cipher = Cipher.getInstance(transformation);
@@ -46,6 +57,7 @@ public class RSAService {
     }
 
     // Mã hóa tập tin với khóa công khai
+    @Override
     public void encryptFile(String srcFile, String destFile, String transformation) throws Exception {
         if (publicKey == null) throw new Exception("Public key is missing.");
 
@@ -67,6 +79,7 @@ public class RSAService {
     }
 
     // Giải mã tập tin với khóa riêng
+    @Override
     public void decryptFile(String srcFile, String destFile, String transformation) throws Exception {
         if (privateKey == null) throw new Exception("Private key is missing.");
 
@@ -88,58 +101,64 @@ public class RSAService {
     }
 
     // Xuất khóa công khai dưới dạng Base64
+    @Override
     public String exportPublicKey() {
         if (publicKey == null) return null;
         return Base64.getEncoder().encodeToString(publicKey.getEncoded());
     }
 
     // Xuất khóa riêng dưới dạng Base64
+    @Override
     public String exportPrivateKey() {
         if (privateKey == null) return null;
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
 
     // Nhập khóa công khai từ chuỗi Base64
-    public PublicKey importPublicKey(String publicKeyStr) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    @Override
+    public PublicKey importPublicKey(String publicKeyStr) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
         byte[] bytePublicKey = Base64.getDecoder().decode(publicKeyStr);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(bytePublicKey);
-        publicKey = keyFactory.generatePublic(keySpec);
+        publicKey = (ECPublicKey) keyFactory.generatePublic(keySpec);
         return publicKey;
     }
 
     // Nhập khóa riêng từ chuỗi Base64
-    public PrivateKey importPrivateKey(String privateKeyStr) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    @Override
+    public PrivateKey importPrivateKey(String privateKeyStr) throws InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
         byte[] bytePrivateKey = Base64.getDecoder().decode(privateKeyStr);
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance("EC", "BC");
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(bytePrivateKey);
-        privateKey = keyFactory.generatePrivate(keySpec);
+        privateKey = (ECPrivateKey) keyFactory.generatePrivate(keySpec);
         return privateKey;
     }
+
     public static void main(String[] args) {
         try {
-            // Tạo đối tượng RSAService và tạo cặp khóa
-            RSAService rsaService = new RSAService();
-            rsaService.generateKey(2048);
+            // Tạo đối tượng ECCService và tạo cặp khóa
+            ECCService eccService = new ECCService();
+            eccService.generateKey(256); // SECP256r1 (256 bits)
 
             // Mã hóa và giải mã chuỗi
-            String text = "Thử mã hóa RSA!";
+            String text = "Thử mã hóa ECC!";
             System.out.println("Original text: " + text);
-            String encryptedTextBase64 = rsaService.encryptToBase64(text, "RSA");
+            String encryptedTextBase64 = eccService.encrypt(text, "ECIES");
             System.out.println("Encrypted text (Base64): " + encryptedTextBase64);
 
-            String decryptedText = rsaService.decryptFromBase64(encryptedTextBase64, "RSA");
+            String decryptedText = eccService.decrypt(encryptedTextBase64, "ECIES");
             System.out.println("Decrypted text: " + decryptedText);
 
             // Mã hóa và giải mã tập tin
             String srcFileEncrypt = "E:\\Dowload\\testMaHoa.json";
             String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
             String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";
+
             // Mã hóa tập tin
-            rsaService.encryptFile(srcFileEncrypt, destFileEncrypt, "RSA");
+            eccService.encryptFile(srcFileEncrypt, destFileEncrypt, "ECIES");
 
             // Giải mã tập tin
-            rsaService.decryptFile(destFileEncrypt, destFileDecrypt, "RSA");
+            eccService.decryptFile(destFileEncrypt, destFileDecrypt, "ECIES");
 
             // Kiểm tra nội dung file giải mã
             String decryptedFileContent = new String(Files.readAllBytes(Paths.get(destFileDecrypt)));
