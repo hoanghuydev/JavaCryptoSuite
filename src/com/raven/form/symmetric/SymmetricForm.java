@@ -1,130 +1,204 @@
 package com.raven.form.symmetric;
 
 import javax.swing.*;
+import javax.swing.border.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class SymmetricForm {
     private JPanel panel;
 
     public SymmetricForm() {
-        // Khởi tạo panel chính với GridBagLayout
-        panel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5); // Lề giữa các thành phần
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        initializeComponents();
+    }
 
-        // Hàng 1: Chọn giải thuật và Mode/Padding
-        JLabel lblAlgorithm = new JLabel("Chọn giải thuật:");
-        JComboBox<String> comboAlgorithm = new JComboBox<>(new String[]{"AES", "DES", "RSA"});
-        JLabel lblMode = new JLabel("Mode/Padding:");
-        JComboBox<String> comboMode = new JComboBox<>(new String[]{"ECB/PKCS5", "CBC/PKCS7"});
+    private void initializeComponents() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        panel.add(lblAlgorithm, gbc);
+        panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        panel.add(comboAlgorithm, gbc);
+        // Create top control panel
+        JPanel controlPanel = createControlPanel();
 
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        panel.add(lblMode, gbc);
+        // Create input/output panel
+        JPanel inputOutputPanel = createInputOutputPanel();
 
-        gbc.gridx = 3;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        panel.add(comboMode, gbc);
+        // Main layout assembly
+        panel.add(controlPanel, BorderLayout.NORTH);
+        panel.add(inputOutputPanel, BorderLayout.CENTER);
+    }
 
-        // Hàng 2: Key và các nút liên quan
-        JLabel lblKey = new JLabel("Key:");
-        JTextField txtKey = new JTextField(15);
-        JComboBox<String> comboKeySize = new JComboBox<>(new String[]{"128 bit", "192 bit", "256 bit"});
-        JButton btnGenerateKey = new JButton("Tạo Key");
-        JButton btnCopyKey = new JButton("Copy");
+    private JPanel createControlPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 10));
+        panel.setBorder(createShadowBorder());
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        panel.add(lblKey, gbc);
+        // Algorithm Selection
+        JLabel algorithmLabel = createStyledLabel("Algorithm:", "🔐");
+        String[] algorithms = {"AES", "DES", "Blowfish", "Serpent", "Twofish"};
+        JComboBox<String> algorithmCombo = createStyledComboBox(algorithms);
 
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 2;
-        panel.add(txtKey, gbc);
+        // Mode/Padding Selection
+        JLabel modeLabel = createStyledLabel("Mode/Padding:", "🔒");
+        String[] modes = {"ECB/PKCS5", "CBC/PKCS7"};
+        JComboBox<String> modeCombo = createStyledComboBox(modes);
 
-        gbc.gridx = 3;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        panel.add(comboKeySize, gbc);
+        // Key Size Selection
+        JLabel keySizeLabel = createStyledLabel("Key Size:", "🔑");
+        String[] keySizes = {"128 bit", "192 bit", "256 bit"};
+        JComboBox<String> keySizeCombo = createStyledComboBox(keySizes);
 
-        gbc.gridx = 4;
-        gbc.gridy = 1;
-        panel.add(btnGenerateKey, gbc);
+        // Generate Key Button
+        JButton generateKeyButton = createStyledButton("Generate Key", "⚡");
+        generateKeyButton.setBackground(new Color(100, 180, 100));
+        generateKeyButton.setForeground(Color.BLACK);
 
-        gbc.gridx = 5;
-        gbc.gridy = 1;
-        panel.add(btnCopyKey, gbc);
+        // Execute Button
+        JButton executeButton = createStyledButton("Execute", "▶️");
+        executeButton.setBackground(new Color(75, 75, 245));
+        executeButton.setForeground(Color.BLACK);
 
-        // Hàng 3: Nhập đoạn văn bản cần mã hóa
-        JTextArea txtInput = new JTextArea(3, 30);
-        txtInput.setBorder(BorderFactory.createTitledBorder("Nhập đoạn văn bản cần mã hóa tại đây..."));
+        // Reset Button
+        JButton resetButton = createStyledButton("Reset", "🔃");
+        resetButton.addActionListener(e -> resetForm());
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 6;
-        panel.add(txtInput, gbc);
+        panel.setPreferredSize(new Dimension(600, 95));
+        panel.add(algorithmLabel);
+        panel.add(algorithmCombo);
+        panel.add(modeLabel);
+        panel.add(modeCombo);
+        panel.add(keySizeLabel);
+        panel.add(keySizeCombo);
+        panel.add(generateKeyButton);
+        panel.add(executeButton);
+        panel.add(resetButton);
 
-        // Hàng 4: Đoạn văn bản mã hóa và nút Copy
-        JTextArea txtEncrypted = new JTextArea(3, 30);
-        txtEncrypted.setBorder(BorderFactory.createTitledBorder("Đoạn văn bản mã hóa"));
-        JButton btnCopyEncrypted = new JButton("Copy");
+        return panel;
+    }
 
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 5;
-        panel.add(txtEncrypted, gbc);
+    private JPanel createInputOutputPanel() {
+        JPanel panel = new JPanel(new GridLayout(3, 1, 10, 10));
 
-        gbc.gridx = 5;
-        gbc.gridy = 3;
-        gbc.gridwidth = 1;
-        panel.add(btnCopyEncrypted, gbc);
+        // Key Panel
+        JPanel keyPanel = createKeyPanel();
 
-        // Hàng 5: Đoạn văn bản giải mã
-        JTextArea txtDecrypted = new JTextArea(3, 30);
-        txtDecrypted.setBorder(BorderFactory.createTitledBorder("Đoạn văn bản giải mã"));
+        // Input Panel
+        JPanel inputPanel = createTextPanel("Input Text", "✏️");
 
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        gbc.gridwidth = 6;
-        panel.add(txtDecrypted, gbc);
+        // Output Panel
+        JPanel outputPanel = createTextPanel("Output Text", "📝");
 
-        // Hàng 6: Các nút Mã hóa, Giải mã, Làm mới, File
-        JButton btnEncrypt = new JButton("Mã hóa");
-        JButton btnDecrypt = new JButton("Giải mã");
-        JButton btnReset = new JButton("Làm mới");
-        JButton btnFile = new JButton("File");
+        panel.add(keyPanel);
+        panel.add(inputPanel);
+        panel.add(outputPanel);
 
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.gridwidth = 1;
-        panel.add(btnEncrypt, gbc);
+        return panel;
+    }
 
-        gbc.gridx = 1;
-        gbc.gridy = 5;
-        panel.add(btnDecrypt, gbc);
+    private JPanel createKeyPanel() {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(createShadowBorder());
 
-        gbc.gridx = 2;
-        gbc.gridy = 5;
-        panel.add(btnReset, gbc);
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel keyLabel = createStyledLabel("Encryption Key", "🔑");
+        JButton copyKeyButton = createSmallButton("📋", "Copy Key", null);
+        JButton generateKeyButton = createSmallButton("⚡", "Generate Key", null);
 
-        gbc.gridx = 3;
-        gbc.gridy = 5;
-        gbc.gridwidth = 3;
-        panel.add(btnFile, gbc);
+        headerPanel.add(keyLabel);
+        headerPanel.add(Box.createHorizontalStrut(10));
+        headerPanel.add(copyKeyButton);
+        headerPanel.add(generateKeyButton);
+
+        JTextArea keyTextArea = createStyledTextArea(3, 30);
+        panel.add(headerPanel, BorderLayout.NORTH);
+        panel.add(new JScrollPane(keyTextArea), BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JPanel createTextPanel(String title, String icon) {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(createShadowBorder());
+
+        JLabel titleLabel = createStyledLabel(title, icon);
+        JTextArea textArea = createStyledTextArea(5, 30);
+
+        panel.add(titleLabel, BorderLayout.NORTH);
+        panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JButton createSmallButton(String icon, String tooltip, ActionListener action) {
+        JButton button = new JButton(icon);
+        button.setToolTipText(tooltip);
+        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 10));
+        button.setPreferredSize(new Dimension(30, 25));
+        button.setMargin(new Insets(1, 1, 1, 1));
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        if (action != null) {
+            button.addActionListener(action);
+        }
+        button.setHorizontalAlignment(SwingConstants.CENTER);
+        button.setVerticalAlignment(SwingConstants.CENTER);
+        return button;
+    }
+
+    private JLabel createStyledLabel(String text, String icon) {
+        JLabel label = new JLabel(icon + " " + text);
+        label.setFont(new Font("Segoe UI Emoji", Font.BOLD, 12));
+        return label;
+    }
+
+    private JComboBox<String> createStyledComboBox(String[] items) {
+        JComboBox<String> comboBox = new JComboBox<>(items);
+        comboBox.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
+        comboBox.setPreferredSize(new Dimension(120, 25));
+        return comboBox;
+    }
+
+    private JButton createStyledButton(String text, String icon) {
+        JButton button = new JButton(icon + " " + text);
+        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
+        button.setFocusPainted(false);
+        button.setBorder(new CompoundBorder(
+                new LineBorder(new Color(200, 200, 200)),
+                new EmptyBorder(5, 10, 5, 10)
+        ));
+        return button;
+    }
+
+    private JTextArea createStyledTextArea(int rows, int cols) {
+        JTextArea textArea = new JTextArea(rows, cols);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setBorder(new CompoundBorder(
+                new LineBorder(new Color(200, 200, 200)),
+                new EmptyBorder(5, 5, 5, 5)
+        ));
+        return textArea;
+    }
+
+    private Border createShadowBorder() {
+        return BorderFactory.createCompoundBorder(
+                new EmptyBorder(3, 3, 3, 3),
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
+                        new EmptyBorder(10, 10, 10, 10)
+                )
+        );
+    }
+
+    private void resetForm() {
+        // Reset all components
+        // You would replace these with your actual component references
+        JOptionPane.showMessageDialog(null, "Form Reset", "Reset", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public JPanel getPanel() {
@@ -133,13 +207,15 @@ public class SymmetricForm {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Symmetric Form");
-            SymmetricForm symmetricForm = new SymmetricForm();
-
-            frame.setContentPane(symmetricForm.getPanel());
+            JFrame frame = new JFrame("Symmetric Encryption");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            SymmetricForm form = new SymmetricForm();
+            frame.setContentPane(form.getPanel());
+
             frame.pack();
             frame.setSize(800, 600);
+            frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
     }

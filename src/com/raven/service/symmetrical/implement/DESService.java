@@ -15,6 +15,7 @@ import java.util.Base64;
 public class DESService implements ISymmetricCipher {
     private SecretKey key;
     private String transformation;
+
     @Override
     public SecretKey generateSecretKey(int length) throws Exception {
         KeyGenerator key_generator = KeyGenerator.getInstance("DES");
