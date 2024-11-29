@@ -2,6 +2,7 @@ package com.raven.controller.implement;
 
 import com.raven.constant.Constants;
 
+import com.raven.constant.Tab;
 import com.raven.controller.*;
 import com.raven.service.asymmetrical.IAsymmetricService;
 import com.raven.service.asymmetrical.implement.ECCService;
@@ -18,9 +19,10 @@ public class AsymmetricController implements IModeSwitchable, IKeyImportable, IK
     private JTextArea privateKeyArea;
     private JTextArea inputTextArea;
     private JTextArea outputTextArea;
+    private JComboBox algorithmCombobo;
     private File file;
     private JLabel filePathLabel;
-    private Constants.Tab currentTab = Constants.Tab.FILE;
+    private Tab currentTab = Tab.FILE;
     private IAsymmetricService asymmetricService;
 
     public AsymmetricController() {
@@ -33,6 +35,7 @@ public class AsymmetricController implements IModeSwitchable, IKeyImportable, IK
         if (messageFileExecute != null) messageFileExecute.setText("");
         if (inputTextArea != null) inputTextArea.setText("");
         if (outputTextArea != null) outputTextArea.setText("");
+//        if (algorithmCombobo!=null) algorithmCombobo.setSelectedItem(0);
         setIsEncryptMode(true);
     }
 
@@ -53,7 +56,7 @@ public class AsymmetricController implements IModeSwitchable, IKeyImportable, IK
         asymmetricService.importPrivateKey(privateKeyArea.getText());
         asymmetricService.importPublicKey(publicKeyArea.getText());
         asymmetricService.setTransformation(transformation);
-        if (currentTab== Constants.Tab.FILE) {
+        if (currentTab== Tab.FILE) {
             if (file == null) {
                 JOptionPane.showMessageDialog(null, "No file selected.");
                 return;
@@ -73,7 +76,6 @@ public class AsymmetricController implements IModeSwitchable, IKeyImportable, IK
                 outputTextArea.setText(decryptText);
             }
         }
-
     }
     @Override
     public void encrypt(String plainText) {

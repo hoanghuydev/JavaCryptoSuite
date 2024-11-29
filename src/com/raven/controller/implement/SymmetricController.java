@@ -1,6 +1,7 @@
 package com.raven.controller.implement;
 
 import com.raven.constant.Constants;
+import com.raven.constant.Tab;
 import com.raven.controller.ICipherSwitchable;
 import com.raven.controller.IFileEncryptable;
 import com.raven.controller.IModeSwitchable;
@@ -28,7 +29,7 @@ public class SymmetricController implements IModeSwitchable, ITextEncryptable, I
     private JButton copyKeyButton;
     private JLabel messageFileExecute;
     private JLabel filePathLabel;
-    private Constants.Tab currentTab = Constants.Tab.FILE;
+    private Tab currentTab = Tab.FILE;
     private JTextArea keyTextArea;
 
     public SymmetricController(){
@@ -67,7 +68,7 @@ public class SymmetricController implements IModeSwitchable, ITextEncryptable, I
     public void execute(String transformation) throws Exception {
         symmetricService.importKey(keyTextArea.getText());
         symmetricService.setTransformation(transformation);
-        if (currentTab== Constants.Tab.FILE) {
+        if (currentTab== Tab.FILE) {
             if (file == null) {
                 JOptionPane.showMessageDialog(null, "No file selected.");
                 return;

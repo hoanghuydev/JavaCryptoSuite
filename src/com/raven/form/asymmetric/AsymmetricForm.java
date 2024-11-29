@@ -1,6 +1,7 @@
 package com.raven.form.asymmetric;
 
 import com.raven.constant.Constants;
+import com.raven.constant.Tab;
 import com.raven.controller.implement.AsymmetricController;
 import com.raven.form.asymmetric.components.ControlPanel;
 import com.raven.form.asymmetric.components.FilePanel;
@@ -47,7 +48,7 @@ public class AsymmetricForm {
         }
         tabbedPane.addChangeListener(e -> {
             int selectedTabIndex = tabbedPane.getSelectedIndex();
-            controller.setCurrentTab(Constants.Tab.fromValue(selectedTabIndex));
+            controller.setCurrentTab(Tab.fromValue(selectedTabIndex));
         });
 
         // Main layout assembly

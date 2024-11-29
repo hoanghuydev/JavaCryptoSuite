@@ -1,6 +1,10 @@
 package com.raven.service.classical;
 
+import javax.crypto.SecretKey;
+
 public interface IClassicalService {
-    public String decrypt(String inputText);
-    public String encrypt(String inputText);
+    boolean requireKey();
+    String generateKey(int length);
+    String decrypt(String inputText);
+    String encrypt(String inputText);
 }

@@ -43,11 +43,14 @@ public class BasicCipherForm {
 
 
 
-        inputLabel = new com.raven.component.Label("Plain Text", "✏️");
-        outputLabel = new Label("Encrypted Text", "📝");
+        inputLabel = new com.raven.component.Label("Input Text", "✏️");
+        outputLabel = new Label("Output Text", "📝");
 
-        inputTextArea = new com.raven.component.TextArea(10, 30);
+        inputTextArea = new TextArea(10, 30);
+        controller.setInputTextArea(inputTextArea);
         outputTextArea = new TextArea(10, 30);
+        controller.setOutputTextArea(outputTextArea);
+
 
 
     }

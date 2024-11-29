@@ -3,9 +3,7 @@ package com.raven.form.symmetric.components;
 import com.raven.component.*;
 import com.raven.component.Button;
 import com.raven.component.Label;
-import com.raven.constant.Constants;
-import com.raven.constant.KeyLengths;
-import com.raven.constant.Transformation;
+import com.raven.constant.*;
 import com.raven.controller.implement.SymmetricController;
 import com.raven.service.symmetrical.implement.*;
 
@@ -24,7 +22,7 @@ public class ControlPanel extends JPanel {
     private JPanel bottomPanel;
     private JButton executeButton;
     private JButton resetButton;
-    private String currentAlgorithm = Constants.symmetricCiphers[0];
+    private String currentAlgorithm = CipherTypes.SYMMETRIC_CIPHERS[0];
     private int currentKeyLength = KeyLengths.getKeyLengths(currentAlgorithm)[0];
     private String currentTransformation = Transformation.getTransformations(currentAlgorithm).get(0);
 
@@ -37,7 +35,7 @@ public class ControlPanel extends JPanel {
         topPanel.setBorder(new CustomBorder());
 
         JLabel algorithmLabel = new com.raven.component.Label("Algorithm:", "🔐");
-        algorithmCombo = new ComboBox<>(Constants.symmetricCiphers);
+        algorithmCombo = new ComboBox<>(CipherTypes.SYMMETRIC_CIPHERS);
 
         JLabel modeLabel = new com.raven.component.Label("Mode/Padding:", "🔒");
         paddingCombo = new ComboBox<>(new String[0]);
@@ -100,19 +98,19 @@ public class ControlPanel extends JPanel {
     }
     private void setAlgorithm() {
         switch (currentAlgorithm) {
-            case Constants.AES:
+            case CipherAlgorithms.AES:
                 controller.setCipher(new AESService());
                 break;
-            case Constants.DES:
+            case CipherAlgorithms.DES:
                 controller.setCipher(new DESService());
                 break;
-            case Constants.SERPENT:
+            case CipherAlgorithms.SERPENT:
                 controller.setCipher(new SerpentService());
                 break;
-            case Constants.TWOFISH:
+            case CipherAlgorithms.TWOFISH:
                 controller.setCipher(new TwofishService());
                 break;
-            case Constants.BLOWFISH:
+            case CipherAlgorithms.BLOWFISH:
                 controller.setCipher(new BlowfishService());
                 break;
             default:

@@ -2,7 +2,7 @@ package com.raven.service.classical.implement;
 
 import com.raven.service.classical.IClassicalService;
 
-public class SubstitutionService implements IClassicalService {
+public class CaesarService implements IClassicalService {
 
     private static final String ALPHABET_VIETNAM = "aáàảãạâấầẩẫậbcdđeéèẻẽẹêếềểễệfghiíìỉĩịjklmnoóòỏõọôốồổỗộơớờởỡợpqrstuúùủũụưứừửữựvwxyýỳỷỹỵz";
     private static final int SHIFT = 3;
@@ -27,7 +27,6 @@ public class SubstitutionService implements IClassicalService {
         return shiftText(inputText, SHIFT);
     }
 
-
     private String shiftText(String inputText, int shift) {
         StringBuilder outputText = new StringBuilder();
         for (char c : inputText.toCharArray()) {
@@ -41,6 +40,7 @@ public class SubstitutionService implements IClassicalService {
         return outputText.toString();
     }
 
+
     private boolean isVietnameseLetter(char c) {
         return ALPHABET_VIETNAM.indexOf(c) >= 0;
     }
@@ -53,16 +53,14 @@ public class SubstitutionService implements IClassicalService {
     }
 
     public static void main(String[] args) {
-        SubstitutionService substitutionService = new SubstitutionService();
+        CaesarService caesarService = new CaesarService();
         String originalText = "Chào bạn, tôi tên là Trần Võ Hoàng Huy lớp ĐH21ĐTB!";
         System.out.println("Văn bản gốc: " + originalText);
 
+        String encryptedCaesar = caesarService.encrypt(originalText);
+        System.out.println("Caesar Mã hóa: " + encryptedCaesar);
 
-        String encryptedText = substitutionService.encrypt(originalText);
-        System.out.println("Văn bản sau khi mã hóa: " + encryptedText);
-
-
-        String decryptedText = substitutionService.decrypt(encryptedText);
-        System.out.println("Văn bản sau khi giải mã: " + decryptedText);
+        String decryptedCaesar = caesarService.decrypt(encryptedCaesar);
+        System.out.println("Caesar Giải mã: " + decryptedCaesar);
     }
 }

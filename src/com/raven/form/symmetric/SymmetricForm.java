@@ -1,6 +1,7 @@
 package com.raven.form.symmetric;
 
 import com.raven.constant.Constants;
+import com.raven.constant.Tab;
 import com.raven.controller.implement.SymmetricController;
 import com.raven.form.symmetric.components.ControlPanel;
 import com.raven.form.symmetric.components.FilePanel;
@@ -45,7 +46,7 @@ public class SymmetricForm {
         }
         tabbedPane.addChangeListener(e -> {
             int selectedTabIndex = tabbedPane.getSelectedIndex();
-            controller.setCurrentTab(Constants.Tab.fromValue(selectedTabIndex));
+            controller.setCurrentTab(Tab.fromValue(selectedTabIndex));
         });
 
         // Main layout assembly

@@ -5,9 +5,7 @@ import com.raven.component.ComboBox;
 import com.raven.component.CustomBorder;
 import com.raven.component.Label;
 import com.raven.component.Button;
-import com.raven.constant.Constants;
-import com.raven.constant.KeyLengths;
-import com.raven.constant.Transformation;
+import com.raven.constant.*;
 import com.raven.controller.implement.AsymmetricController;
 import com.raven.service.asymmetrical.implement.ECCService;
 import com.raven.service.asymmetrical.implement.RSAService;
@@ -21,12 +19,13 @@ public class ControlPanel extends JPanel {
     private AsymmetricController controller;
     private JPanel topPanel;
     private ComboBox<String> algorithmCombo;
+    private JButton resetButton;
     private ComboBox<Integer> keySizeCombo;
     private ComboBox<String> paddingCombo;
     private JPanel bottomPanel;
     private JButton generateKeyButton;
     private JButton executeButton;
-    private String currentAlgorithm = Constants.asymmetricCiphers[0];
+    private String currentAlgorithm = CipherTypes.ASYMMETRIC_CIPHERS[0];
     private int currentKeyLength = KeyLengths.getKeyLengths(currentAlgorithm)[0];
     private String currentTransformation = Transformation.getTransformations(currentAlgorithm).get(0);
 
@@ -39,7 +38,8 @@ public class ControlPanel extends JPanel {
         topPanel.setBorder(new CustomBorder());
 
         JLabel cipherLabel = new Label("Cipher Type:", "🔐");
-        algorithmCombo = new ComboBox<>(Constants.asymmetricCiphers);
+        algorithmCombo = new ComboBox<>(CipherTypes.ASYMMETRIC_CIPHERS);
+        controller.setAlgorithmCombobo(algorithmCombo);
 
         JLabel keySizeLabel = new Label("Key Size:", "🔑");
         Integer[] keyLengths = Arrays.stream(KeyLengths.getKeyLengths(currentAlgorithm))
@@ -78,7 +78,7 @@ public class ControlPanel extends JPanel {
         executeButton.setBackground(new Color(75, 75, 245));
         executeButton.setForeground(Color.BLACK);
 
-        JButton resetButton = new Button("Reset", "🔃");
+        resetButton = new Button("Reset", "🔃");
         resetButton.addActionListener(e -> controller.resetForm());
 
         bottomPanel.add(generateKeyButton);
@@ -115,10 +115,10 @@ public class ControlPanel extends JPanel {
 
     private void setAlgorithm() {
         switch (currentAlgorithm) {
-            case Constants.RSA:
+            case CipherAlgorithms.RSA:
                 controller.setCipher(new RSAService());
                 break;
-                case Constants.ECC:
+                case CipherAlgorithms.ECC:
                 controller.setCipher(new ECCService());
                 break;
             default:

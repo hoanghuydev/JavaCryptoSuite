@@ -8,21 +8,21 @@ public class Transformation {
     private static final Map<String, List<String>> paddingSchemes = new HashMap<>();
 
     static {
-        cipherModes.put(Constants.AES, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
-        cipherModes.put(Constants.DES, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
-        cipherModes.put(Constants.BLOWFISH, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
-        cipherModes.put(Constants.SERPENT, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
-        cipherModes.put(Constants.TWOFISH, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
-        cipherModes.put(Constants.RSA, Arrays.asList("ECB"));  // RSA thường chỉ có chế độ ECB
-        cipherModes.put(Constants.ECC, Arrays.asList("ECDSA", "ECDH"));
+        cipherModes.put(CipherAlgorithms.AES, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
+        cipherModes.put(CipherAlgorithms.DES, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
+        cipherModes.put(CipherAlgorithms.BLOWFISH, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
+        cipherModes.put(CipherAlgorithms.SERPENT, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
+        cipherModes.put(CipherAlgorithms.TWOFISH, Arrays.asList("ECB", "CBC", "CFB", "OFB"));
+        cipherModes.put(CipherAlgorithms.RSA, Arrays.asList("ECB"));  // RSA thường chỉ có chế độ ECB
+        cipherModes.put(CipherAlgorithms.ECC, Arrays.asList("ECDSA", "ECDH"));
 
-        paddingSchemes.put(Constants.AES, Arrays.asList(Constants.PKCS5Padding, Constants.PKCS7Padding, Constants.NoPadding, Constants.ISO10126Padding));
-        paddingSchemes.put(Constants.DES, Arrays.asList(Constants.PKCS5Padding, Constants.NoPadding));
-        paddingSchemes.put(Constants.BLOWFISH, Arrays.asList(Constants.PKCS5Padding, Constants.PKCS7Padding, Constants.NoPadding));
-        paddingSchemes.put(Constants.SERPENT, Arrays.asList(Constants.PKCS5Padding, Constants.PKCS7Padding, Constants.NoPadding));
-        paddingSchemes.put(Constants.TWOFISH, Arrays.asList(Constants.PKCS5Padding, Constants.PKCS7Padding, Constants.NoPadding));
-        paddingSchemes.put(Constants.RSA, Arrays.asList(Constants.PKCS1Padding, Constants.OAEPWithSHA1AndMGF1Padding, Constants.OAEPWithSHA256AndMGF1Padding));
-        paddingSchemes.put(Constants.ECC, Arrays.asList(Constants.ECDSA, Constants.ECDH));
+        paddingSchemes.put(CipherAlgorithms.AES, Arrays.asList(PaddingSchemes.PKCS5Padding, PaddingSchemes.PKCS7Padding, PaddingSchemes.NoPadding, PaddingSchemes.ISO10126Padding));
+        paddingSchemes.put(CipherAlgorithms.DES, Arrays.asList(PaddingSchemes.PKCS5Padding, PaddingSchemes.NoPadding));
+        paddingSchemes.put(CipherAlgorithms.BLOWFISH, Arrays.asList(PaddingSchemes.PKCS5Padding, PaddingSchemes.PKCS7Padding, PaddingSchemes.NoPadding));
+        paddingSchemes.put(CipherAlgorithms.SERPENT, Arrays.asList(PaddingSchemes.PKCS5Padding, PaddingSchemes.PKCS7Padding, PaddingSchemes.NoPadding));
+        paddingSchemes.put(CipherAlgorithms.TWOFISH, Arrays.asList(PaddingSchemes.PKCS5Padding, PaddingSchemes.PKCS7Padding, PaddingSchemes.NoPadding));
+        paddingSchemes.put(CipherAlgorithms.RSA, Arrays.asList(PaddingSchemes.PKCS1Padding, PaddingSchemes.OAEPWithSHA1AndMGF1Padding, PaddingSchemes.OAEPWithSHA256AndMGF1Padding));
+        paddingSchemes.put(CipherAlgorithms.ECC, Arrays.asList(PaddingSchemes.ECDSA, PaddingSchemes.ECDH));
     }
 
     public static List<String> getTransformations(String algorithm) {
