@@ -47,8 +47,7 @@ public class AsymmetricForm {
         }
         tabbedPane.addChangeListener(e -> {
             int selectedTabIndex = tabbedPane.getSelectedIndex();
-            if (selectedTabIndex==0) controller.setCurrentTab(Constants.TabType.FILE);
-            else if (selectedTabIndex==1) controller.setCurrentTab(Constants.TabType.TEXT);
+            controller.setCurrentTab(Constants.Tab.fromValue(selectedTabIndex));
         });
 
         // Main layout assembly

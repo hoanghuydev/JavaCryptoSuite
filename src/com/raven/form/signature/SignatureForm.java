@@ -1,5 +1,10 @@
 package com.raven.form.signature;
 
+import com.raven.component.*;
+import com.raven.component.Button;
+import com.raven.component.Label;
+import com.raven.component.TextArea;
+
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -26,21 +31,21 @@ public class SignatureForm {
 
     private void setupComponents() {
         JPanel mainPanel = new JPanel(new GridBagLayout());
-        mainPanel.setBorder(createShadowBorder());
+        mainPanel.setBorder(new CustomBorder());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // Tiêu đề
-        JLabel titleLabel = createStyledLabel("Digital Signature Generator", "✍️");
+        JLabel titleLabel = new Label("Digital Signature Generator", "✍️");
         panel.add(titleLabel, BorderLayout.NORTH);
 
         // Hàng 1: Chọn thuật toán và nút reset
-        JLabel lblAlgorithm = createStyledLabel("Algorithm:", "🔐");
-        JComboBox<String> comboAlgorithm = createStyledComboBox(
+        JLabel lblAlgorithm = new Label("Algorithm:", "🔐");
+        JComboBox<String> comboAlgorithm = new ComboBox<>(
                 new String[]{"MD5", "SHA-1", "SHA-256", "SHA-512"}
         );
-        JButton btnReset = createSmallButton("🔃", "Reset Form", e -> resetForm());
+        JButton btnReset = new SmallButton("🔃", "Reset Form", e -> resetForm());
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -56,8 +61,8 @@ public class SignatureForm {
         mainPanel.add(btnReset, gbc);
 
         // Hàng 2: Chọn file
-        JButton btnChooseFile = createStyledButton("Choose File", "📁");
-        JTextArea fileArea = createStyledTextArea(2, 30);
+        JButton btnChooseFile = new Button("Choose File", "📁");
+        JTextArea fileArea = new TextArea(2, 30);
         fileArea.setEditable(false);
 
         gbc.gridx = 0;
@@ -71,9 +76,9 @@ public class SignatureForm {
         mainPanel.add(new JScrollPane(fileArea), gbc);
 
         // Hàng 3: Input và nút xác nhận
-        JLabel lblInput = createStyledLabel("Input Text:", "✏️");
-        JTextArea inputArea = createStyledTextArea(8, 30);
-        JButton btnConfirm = createStyledButton("Confirm", "✅");
+        JLabel lblInput = new Label("Input Text:", "✏️");
+        JTextArea inputArea = new TextArea(8, 30);
+        JButton btnConfirm = new Button("Confirm", "✅");
         btnConfirm.setBackground(new Color(100, 180, 100)); // Màu xanh lá nhạt
 
         gbc.gridx = 0;
@@ -93,8 +98,8 @@ public class SignatureForm {
         mainPanel.add(btnConfirm, gbc);
 
         // Output area
-        JLabel lblOutput = createStyledLabel("Signature:", "🔑");
-        JTextArea outputArea = createStyledTextArea(4, 30);
+        JLabel lblOutput = new Label("Signature:", "🔑");
+        JTextArea outputArea = new TextArea(4, 30);
         outputArea.setEditable(false);
 
         gbc.gridx = 0;
@@ -114,67 +119,6 @@ public class SignatureForm {
     private void resetForm() {
         JOptionPane.showMessageDialog(null, "Form Reset", "Reset", JOptionPane.INFORMATION_MESSAGE);
     }
-
-    private JLabel createStyledLabel(String text, String icon) {
-        JLabel label = new JLabel(icon + " " + text);
-        label.setFont(new Font("Segoe UI Emoji", Font.BOLD, 12));
-        return label;
-    }
-
-    private JComboBox<String> createStyledComboBox(String[] items) {
-        JComboBox<String> comboBox = new JComboBox<>(items);
-        comboBox.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
-        comboBox.setPreferredSize(new Dimension(200, 25));
-        return comboBox;
-    }
-
-    private JTextArea createStyledTextArea(int rows, int cols) {
-        JTextArea textArea = new JTextArea(rows, cols);
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        textArea.setLineWrap(true);
-        textArea.setWrapStyleWord(true);
-        textArea.setBorder(new CompoundBorder(
-                new LineBorder(new Color(200, 200, 200)),
-                new EmptyBorder(5, 5, 5, 5)
-        ));
-        return textArea;
-    }
-
-    private JButton createSmallButton(String icon, String tooltip, ActionListener action) {
-        JButton button = new JButton(icon);
-        button.setToolTipText(tooltip);
-        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 10));
-        button.setPreferredSize(new Dimension(30, 25));
-        button.setMargin(new Insets(1, 1, 1, 1));
-        button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        if (action != null) {
-            button.addActionListener(action);
-        }
-        return button;
-    }
-
-    private JButton createStyledButton(String text, String icon) {
-        JButton button = new JButton(icon + " " + text);
-        button.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
-        button.setFocusPainted(false);
-        button.setBorder(new CompoundBorder(
-                new LineBorder(new Color(200, 200, 200)),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        return button;
-    }
-
-    private Border createShadowBorder() {
-        return BorderFactory.createCompoundBorder(
-                new EmptyBorder(3, 3, 3, 3),
-                BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(new Color(200, 200, 200)),
-                        new EmptyBorder(10, 10, 10, 10)
-                )
-        );
-    }
-
     public JPanel getPanel() {
         return panel;
     }

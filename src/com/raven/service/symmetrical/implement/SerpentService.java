@@ -1,6 +1,6 @@
 package com.raven.service.symmetrical.implement;
 
-import com.raven.service.symmetrical.ISymmetricCipher;
+import com.raven.service.symmetrical.ISymmetricService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import javax.crypto.Cipher;
@@ -14,7 +14,7 @@ import java.io.FileOutputStream;
 import java.security.Security;
 import java.util.Base64;
 
-public class SerpentService implements ISymmetricCipher {
+public class SerpentService implements ISymmetricService {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -33,7 +33,7 @@ public class SerpentService implements ISymmetricCipher {
 
 
     @Override
-    public String encryptToBase64(String text) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         if (transformation.contains("ECB")) cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -76,7 +76,7 @@ public class SerpentService implements ISymmetricCipher {
     }
 
     @Override
-    public String decryptFromBase64(String text) throws Exception {
+    public String decrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         if (transformation.contains("ECB")) cipher.init(Cipher.DECRYPT_MODE, key);
@@ -140,6 +140,7 @@ public class SerpentService implements ISymmetricCipher {
         }
     }
 
+    @Override
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
@@ -149,11 +150,11 @@ public class SerpentService implements ISymmetricCipher {
         SerpentService serpent = new SerpentService();
         serpent.setTransformation("Serpent/CBC/PKCS5Padding");
         serpent.generateSecretKey(128);
-        String encrypt_text = serpent.encryptToBase64(plain_text);
+        String encrypt_text = serpent.encrypt(plain_text);
         System.out.println("Key: " + serpent.exportKey());
         System.out.println("------------------------------------");
         System.out.println("Encrypt To Base64: " + encrypt_text);
-        System.out.println(serpent.decryptFromBase64(encrypt_text));
+        System.out.println(serpent.decrypt(encrypt_text));
         String srcFileEncrypt = "E:\\Dowload\\testMaHoa.json";
         String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
         String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";

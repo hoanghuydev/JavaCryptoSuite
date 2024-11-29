@@ -7,11 +7,9 @@ import com.raven.service.classical.implement.ShiftService;
 import com.raven.service.classical.implement.SubstitutionService;
 
 public class BasicCipherController {
-    private BasicCipherForm view;
     private boolean isEncryptMode = true;
 
-    public BasicCipherController(BasicCipherForm view) {
-        this.view = view;
+    public BasicCipherController() {
     }
 
     public boolean isEncryptMode() {
@@ -23,22 +21,7 @@ public class BasicCipherController {
     }
 
     public void executeOperation() {
-        String algorithm = view.getSelectedAlgorithm();
-        String inputText = view.getInputText();
-        String result;
 
-        IClassicalService cipherService = getCipherService(algorithm);
-        if (cipherService == null) {
-            result = "Selected algorithm not implemented.";
-        } else {
-            if (isEncryptMode) {
-                result = cipherService.encrypt(inputText);
-            } else {
-                result = cipherService.decrypt(inputText);
-            }
-        }
-
-        view.setOutputText(result);
     }
 
     private IClassicalService getCipherService(String algorithm) {

@@ -22,23 +22,23 @@ public class ECCService implements IAsymmetricService {
     private KeyPair keyPair;
     private ECPublicKey publicKey;
     private ECPrivateKey privateKey;
+    private String transformation;
 
     static {
-        Security.addProvider(new BouncyCastleProvider()); // Thêm BouncyCastle vào Java Security Provider
+        Security.addProvider(new BouncyCastleProvider());
     }
 
-    // Tạo cặp khóa ECC (public và private)
     @Override
     public void generateKey(int length) throws Exception {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC", "BC");
-        keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1")); // SECP256r1 là đường cong elliptic phổ biến
+        keyPairGenerator.initialize(new ECGenParameterSpec("secp256r1"));
         keyPair = keyPairGenerator.generateKeyPair();
         publicKey = (ECPublicKey) keyPair.getPublic();
         privateKey = (ECPrivateKey) keyPair.getPrivate();
     }
 
     @Override
-    public String encrypt(String text, String transformation) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (publicKey == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -47,7 +47,7 @@ public class ECCService implements IAsymmetricService {
     }
 
     @Override
-    public String decrypt(String encrypted, String transformation) throws Exception {
+    public String decrypt(String encrypted) throws Exception {
         if (privateKey == null) return "";
         byte[] encryptedBytes = Base64.getDecoder().decode(encrypted);
         Cipher cipher = Cipher.getInstance(transformation);
@@ -58,7 +58,7 @@ public class ECCService implements IAsymmetricService {
 
     // Mã hóa tập tin với khóa công khai
     @Override
-    public void encryptFile(String srcFile, String destFile, String transformation) throws Exception {
+    public void encryptFile(String srcFile, String destFile) throws Exception {
         if (publicKey == null) throw new Exception("Public key is missing.");
 
         Cipher cipher = Cipher.getInstance(transformation);
@@ -80,7 +80,7 @@ public class ECCService implements IAsymmetricService {
 
     // Giải mã tập tin với khóa riêng
     @Override
-    public void decryptFile(String srcFile, String destFile, String transformation) throws Exception {
+    public void decryptFile(String srcFile, String destFile) throws Exception {
         if (privateKey == null) throw new Exception("Private key is missing.");
 
         Cipher cipher = Cipher.getInstance(transformation);
@@ -134,6 +134,11 @@ public class ECCService implements IAsymmetricService {
         return privateKey;
     }
 
+    @Override
+    public void setTransformation(String transformation) {
+        this.transformation = transformation;
+    }
+
     public static void main(String[] args) {
         try {
             // Tạo đối tượng ECCService và tạo cặp khóa
@@ -143,10 +148,10 @@ public class ECCService implements IAsymmetricService {
             // Mã hóa và giải mã chuỗi
             String text = "Thử mã hóa ECC!";
             System.out.println("Original text: " + text);
-            String encryptedTextBase64 = eccService.encrypt(text, "ECIES");
+            String encryptedTextBase64 = eccService.encrypt(text);
             System.out.println("Encrypted text (Base64): " + encryptedTextBase64);
 
-            String decryptedText = eccService.decrypt(encryptedTextBase64, "ECIES");
+            String decryptedText = eccService.decrypt(encryptedTextBase64);
             System.out.println("Decrypted text: " + decryptedText);
 
             // Mã hóa và giải mã tập tin
@@ -155,10 +160,10 @@ public class ECCService implements IAsymmetricService {
             String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";
 
             // Mã hóa tập tin
-            eccService.encryptFile(srcFileEncrypt, destFileEncrypt, "ECIES");
+            eccService.encryptFile(srcFileEncrypt, destFileEncrypt);
 
             // Giải mã tập tin
-            eccService.decryptFile(destFileEncrypt, destFileDecrypt, "ECIES");
+            eccService.decryptFile(destFileEncrypt, destFileDecrypt);
 
             // Kiểm tra nội dung file giải mã
             String decryptedFileContent = new String(Files.readAllBytes(Paths.get(destFileDecrypt)));

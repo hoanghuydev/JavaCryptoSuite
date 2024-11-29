@@ -1,11 +1,11 @@
-package com.raven.form.asymmetric.components;
+package com.raven.form.symmetric.components;
+
 
 import com.raven.component.Button;
 import com.raven.component.CustomBorder;
 import com.raven.component.Label;
-import com.raven.component.TextArea;
 import com.raven.controller.implement.AsymmetricController;
-import com.raven.form.asymmetric.AsymmetricForm;
+import com.raven.controller.implement.SymmetricController;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -15,9 +15,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class FilePanel extends JPanel {
-    JLabel messageFileExecute;
+    private JLabel messageFileExecute;
     private JLabel filePathLabel;
-    public FilePanel(AsymmetricController controller) {
+    public FilePanel(SymmetricController controller) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -36,7 +36,6 @@ public class FilePanel extends JPanel {
         controller.setFilePathLabel(filePathLabel);
         filePathLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
 
-        // ActionListener for Choose File button
         chooseFileBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

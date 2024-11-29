@@ -9,7 +9,7 @@ import java.awt.*;
 public class TextArea extends JTextArea {
     public TextArea(int rows, int cols) {
         super(rows, cols);
-        setFont(new Font("Segoe UI Emoji", Font.PLAIN, 12));
+        setFont(new Font("Arial", Font.PLAIN, 12));
         setBorder(new CompoundBorder(
                 new LineBorder(new Color(200, 200, 200)),
                 new EmptyBorder(5, 5, 5, 5)

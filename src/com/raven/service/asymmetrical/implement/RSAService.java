@@ -18,6 +18,7 @@ public class RSAService implements IAsymmetricService {
     private KeyPair keyPair;
     private PublicKey publicKey;
     private PrivateKey privateKey;
+    private String transformation;
 
     // Tạo cặp khóa RSA (public và private)
     @Override
@@ -30,7 +31,7 @@ public class RSAService implements IAsymmetricService {
     }
 
     @Override
-    public String encrypt(String text, String transformation) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (publicKey == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -39,7 +40,7 @@ public class RSAService implements IAsymmetricService {
     }
 
     @Override
-    public String decrypt(String encrypted, String transformation) throws Exception {
+    public String decrypt(String encrypted) throws Exception {
         if (privateKey == null) return "";
         byte[] encryptedBytes = Base64.getDecoder().decode(encrypted);
         Cipher cipher = Cipher.getInstance(transformation);
@@ -50,7 +51,7 @@ public class RSAService implements IAsymmetricService {
 
     // Mã hóa tập tin với khóa công khai
     @Override
-    public void encryptFile(String srcFile, String destFile, String transformation) throws Exception {
+    public void encryptFile(String srcFile, String destFile) throws Exception {
         if (publicKey == null) throw new Exception("Public key is missing.");
 
         Cipher cipher = Cipher.getInstance(transformation);
@@ -72,7 +73,7 @@ public class RSAService implements IAsymmetricService {
 
     // Giải mã tập tin với khóa riêng
     @Override
-    public void decryptFile(String srcFile, String destFile, String transformation) throws Exception {
+    public void decryptFile(String srcFile, String destFile) throws Exception {
         if (privateKey == null) throw new Exception("Private key is missing.");
 
         Cipher cipher = Cipher.getInstance(transformation);
@@ -131,13 +132,14 @@ public class RSAService implements IAsymmetricService {
             RSAService rsaService = new RSAService();
             rsaService.generateKey(2048);
 
+            rsaService.setTransformation("RSA/ECB/PKCS1Padding");
             // Mã hóa và giải mã chuỗi
             String text = "Thử mã hóa RSA!";
             System.out.println("Original text: " + text);
-            String encryptedTextBase64 = rsaService.encrypt(text, "RSA");
+            String encryptedTextBase64 = rsaService.encrypt(text);
             System.out.println("Encrypted text (Base64): " + encryptedTextBase64);
 
-            String decryptedText = rsaService.decrypt(encryptedTextBase64, "RSA");
+            String decryptedText = rsaService.decrypt(encryptedTextBase64);
             System.out.println("Decrypted text: " + decryptedText);
 
             // Mã hóa và giải mã tập tin
@@ -145,10 +147,10 @@ public class RSAService implements IAsymmetricService {
             String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
             String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";
             // Mã hóa tập tin
-            rsaService.encryptFile(srcFileEncrypt, destFileEncrypt, "RSA");
+            rsaService.encryptFile(srcFileEncrypt, destFileEncrypt);
 
             // Giải mã tập tin
-            rsaService.decryptFile(destFileEncrypt, destFileDecrypt, "RSA");
+            rsaService.decryptFile(destFileEncrypt, destFileDecrypt);
 
             // Kiểm tra nội dung file giải mã
             String decryptedFileContent = new String(Files.readAllBytes(Paths.get(destFileDecrypt)));
@@ -157,5 +159,10 @@ public class RSAService implements IAsymmetricService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setTransformation(String transformation) {
+        this.transformation = transformation;
     }
 }

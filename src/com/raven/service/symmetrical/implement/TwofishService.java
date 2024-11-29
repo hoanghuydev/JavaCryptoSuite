@@ -11,10 +11,10 @@ import java.io.FileOutputStream;
 import java.security.Security;
 import java.util.Base64;
 
-import com.raven.service.symmetrical.ISymmetricCipher;
+import com.raven.service.symmetrical.ISymmetricService;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
-public class TwofishService implements ISymmetricCipher {
+public class TwofishService implements ISymmetricService {
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
@@ -30,7 +30,7 @@ public class TwofishService implements ISymmetricCipher {
     }
 
     @Override
-    public String encryptToBase64(String text) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         if (transformation.contains("ECB")) cipher.init(Cipher.ENCRYPT_MODE, key);
@@ -73,7 +73,7 @@ public class TwofishService implements ISymmetricCipher {
     }
 
     @Override
-    public String decryptFromBase64(String text) throws Exception {
+    public String decrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
         if (transformation.contains("ECB")) cipher.init(Cipher.DECRYPT_MODE, key);
@@ -141,6 +141,8 @@ public class TwofishService implements ISymmetricCipher {
     public SecretKey getKey() {
         return key;
     }
+
+    @Override
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
@@ -150,10 +152,10 @@ public class TwofishService implements ISymmetricCipher {
         TwofishService twoFish = new TwofishService();
         twoFish.setTransformation("TwoFish/CBC/PKCS5Padding");
         twoFish.generateSecretKey(128);
-        String encrypt_text = twoFish.encryptToBase64(plain_text);
+        String encrypt_text = twoFish.encrypt(plain_text);
         System.out.println("Key: " + twoFish.exportKey());
         System.out.println("Encrypt To Base64: " + encrypt_text);
-        System.out.println(twoFish.decryptFromBase64(encrypt_text));
+        System.out.println(twoFish.decrypt(encrypt_text));
         String srcFileEncrypt = "E:\\Dowload\\testMaHoa.json";
         String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
         String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";

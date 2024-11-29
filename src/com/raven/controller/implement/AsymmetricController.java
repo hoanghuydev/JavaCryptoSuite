@@ -1,55 +1,31 @@
 package com.raven.controller.implement;
 
 import com.raven.constant.Constants;
-import com.raven.constant.asymmetric.algorithm.AsymmetricAlgorithm;
-import com.raven.constant.asymmetric.key.AsymmetricKeySize;
-import com.raven.constant.asymmetric.padding.ECCPadding;
-import com.raven.constant.asymmetric.padding.RSAPadding;
-import com.raven.controller.IModeSwitchable;
-import com.raven.controller.IFileEncryptable;
-import com.raven.controller.IKeyExportable;
-import com.raven.controller.IKeyImportable;
+
+import com.raven.controller.*;
+import com.raven.service.asymmetrical.IAsymmetricService;
 import com.raven.service.asymmetrical.implement.ECCService;
 import com.raven.service.asymmetrical.implement.RSAService;
+import lombok.Data;
 
 import javax.swing.*;
 import java.io.File;
-
-public class AsymmetricController implements IModeSwitchable, IKeyImportable, IKeyExportable, IFileEncryptable {
-    private JTabbedPane tabbedPane;
-    private int keySize = Integer.parseInt(String.valueOf(AsymmetricKeySize.SIZE_512.getSize()));
-    private AsymmetricAlgorithm algorithm = AsymmetricAlgorithm.RSA;
-    private Object padding = RSAPadding.NO_PADDING.getValue();
+@Data
+public class AsymmetricController implements IModeSwitchable, IKeyImportable, IKeyExportable, IFileEncryptable, ITextEncryptable, IKeyGeneratable, ICipherSwitchable<IAsymmetricService> {
     private boolean isEncryptMode = true;
     private JLabel messageFileExecute;
     private JTextArea publicKeyArea;
     private JTextArea privateKeyArea;
     private JTextArea inputTextArea;
     private JTextArea outputTextArea;
-    private File inputFile;
+    private File file;
     private JLabel filePathLabel;
-    private boolean isEncrypt = true;
-    private Constants.TabType currentTab;
-    private RSAService rsaService;
-    private ECCService eccService;
+    private Constants.Tab currentTab = Constants.Tab.FILE;
+    private IAsymmetricService asymmetricService;
+
     public AsymmetricController() {
-        this.rsaService = getRsaService();
-        this.eccService = getEccService();
+        asymmetricService = new RSAService();
     }
-    public RSAService getRsaService() {
-        if (rsaService == null) {
-            rsaService = new RSAService();
-        }
-        return rsaService;
-    }
-
-    public ECCService getEccService() {
-        if (eccService == null) {
-            eccService = new ECCService();
-        }
-        return eccService;
-    }
-
 
     public void resetForm() {
         if (publicKeyArea != null) publicKeyArea.setText("");
@@ -59,38 +35,53 @@ public class AsymmetricController implements IModeSwitchable, IKeyImportable, IK
         if (outputTextArea != null) outputTextArea.setText("");
         setIsEncryptMode(true);
     }
-    public void genarateKey() throws Exception {
-        System.out.println("Gen key");
-        if (AsymmetricAlgorithm.RSA.equals(algorithm)) {
-            rsaService.generateKey(keySize);
-            System.out.println(rsaService.exportPrivateKey());
-            publicKeyArea.setText(rsaService.exportPublicKey());
-            privateKeyArea.setText(rsaService.exportPrivateKey());
-        } else if (AsymmetricAlgorithm.ECC.equals(algorithm)) {
-            eccService.generateKey(keySize);
-            publicKeyArea.setText(eccService.exportPublicKey());
-            privateKeyArea.setText(eccService.exportPrivateKey());
+
+    @Override
+    public void generateKey(int keySize)  {
+        try {
+            asymmetricService.generateKey(keySize);
+            String publicKey = asymmetricService.exportPublicKey();
+            publicKeyArea.setText(publicKey);
+            String privateKey = asymmetricService.exportPrivateKey();
+            privateKeyArea.setText(privateKey);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
 
-    public void execute() throws Exception {
-        if (currentTab.equals(Constants.TabType.FILE)) {
-
+    public void execute(String transformation) throws Exception {
+        asymmetricService.importPrivateKey(privateKeyArea.getText());
+        asymmetricService.importPublicKey(publicKeyArea.getText());
+        asymmetricService.setTransformation(transformation);
+        if (currentTab== Constants.Tab.FILE) {
+            if (file == null) {
+                JOptionPane.showMessageDialog(null, "No file selected.");
+                return;
+            }
+            if (isEncryptMode) {
+                encryptFile(file);
+            }
+            else {
+                decryptFile(file);
+            }
         } else {
-            if (AsymmetricAlgorithm.RSA.equals(algorithm)) {
-                if (isEncrypt()) {
-                    rsaService.encrypt(inputTextArea.getText(),padding.toString());
-                } else {
-                    rsaService.decrypt(inputTextArea.getText(),padding.toString());
-                }
-            } else if (AsymmetricAlgorithm.ECC.equals(algorithm)) {
-                if (isEncrypt()) {
-                    eccService.encrypt(inputTextArea.getText(),padding.toString());
-                } else {
-                    eccService.decrypt(inputTextArea.getText(),padding.toString());
-                }
+            if (isEncryptMode) {
+                String encryptText = asymmetricService.encrypt(inputTextArea.getText());
+                outputTextArea.setText(encryptText);
+            } else {
+                String decryptText = asymmetricService.decrypt(inputTextArea.getText());
+                outputTextArea.setText(decryptText);
             }
         }
+
+    }
+    @Override
+    public void encrypt(String plainText) {
+
+    }
+
+    @Override
+    public void decrypt(String cipherText) {
 
     }
 
@@ -106,126 +97,74 @@ public class AsymmetricController implements IModeSwitchable, IKeyImportable, IK
 
     @Override
     public boolean isEncryptMode() {
-        return isEncrypt;
+        return isEncryptMode;
     }
 
     @Override
     public void setIsEncryptMode(boolean isEncrypt) {
-        this.isEncrypt = isEncrypt;
+        this.isEncryptMode = isEncrypt;
     }
 
     @Override
     public void chooseFile() {
         IFileEncryptable.super.chooseFile();
-        if (inputFile != null) {
-            filePathLabel.setText(inputFile.getAbsolutePath());
+        if (file != null) {
+            filePathLabel.setText(file.getAbsolutePath());
         }
     }
     @Override
     public void encryptFile(File file) {
 
+        try {
+            String newFileName = getFileWithSuffix(file, "_encrypted");
+            asymmetricService.encryptFile(file.getAbsolutePath(), newFileName);
+            messageFileExecute.setText("File encrypted: " + newFileName);
+            filePathLabel.setText("Encrypted file saved as: " + newFileName);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Encryption failed: " + e.getMessage());
+        }
     }
 
     @Override
     public void decryptFile(File file) {
 
+        try {
+            String newFileName = getFileWithSuffix(file, "_decrypted");
+            asymmetricService.decryptFile(file.getAbsolutePath(), newFileName);
+            messageFileExecute.setText("File decrypted: " + newFileName);
+            filePathLabel.setText("Decrypted file saved as: " + newFileName);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Decryption failed: " + e.getMessage());
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    private String getFileWithSuffix(File file, String suffix) {
+        String filePath = file.getAbsolutePath();
+        String fileName = file.getName();
+        String fileExtension = "";
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex > 0) {
+            fileExtension = fileName.substring(dotIndex);
+            fileName = fileName.substring(0, dotIndex);
+        }
+        return file.getParent() + File.separator + fileName + suffix + fileExtension;
     }
 
     @Override
     public void setInputFile(File file) {
-        inputFile = file;
+        this.file = file;
     }
 
-    public JLabel getFilePathLabel() {
-        return filePathLabel;
-    }
-    public File getInputFile() {
-        return inputFile;
-    }
-    public JTabbedPane getTabbedPane() {
-        return tabbedPane;
+    @Override
+    public IAsymmetricService getCipher() {
+        return null;
     }
 
-    public void setTabbedPane(JTabbedPane tabbedPane) {
-        this.tabbedPane = tabbedPane;
-    }
+    @Override
+    public void setCipher(IAsymmetricService cipher) {
+        asymmetricService = cipher;
 
-    public void setEncryptMode(boolean encryptMode) {
-        isEncryptMode = encryptMode;
-    }
-
-    public void setFilePathLabel(JLabel filePathLabel) {
-        this.filePathLabel = filePathLabel;
-    }
-
-    public JTextArea getInputTextArea() {
-        return inputTextArea;
-    }
-
-    public void setInputTextArea(JTextArea inputTextArea) {
-        this.inputTextArea = inputTextArea;
-    }
-
-    public JTextArea getOutputTextArea() {
-        return outputTextArea;
-    }
-
-    public void setOutputTextArea(JTextArea outputTextArea) {
-        this.outputTextArea = outputTextArea;
-    }
-
-    public boolean isEncrypt() {
-        return isEncrypt;
-    }
-
-    public void setEncrypt(boolean encrypt) {
-        isEncrypt = encrypt;
-    }
-    public void setPublicKeyArea(JTextArea publicKeyArea) {
-        this.publicKeyArea = publicKeyArea;
-    }
-
-    public void setPrivateKeyArea(JTextArea privateKeyArea) {
-        this.privateKeyArea = privateKeyArea;
-    }
-
-    public Constants.TabType getCurrentTab() {
-        return currentTab;
-    }
-
-    public void setCurrentTab(Constants.TabType currentTab) {
-        this.currentTab = currentTab;
-    }
-
-    public JLabel getMessageFileExecute() {
-        return messageFileExecute;
-    }
-
-    public void setMessageFileExecute(JLabel messageFileExecute) {
-        this.messageFileExecute = messageFileExecute;
-    }
-
-    public int getKeySize() {
-        return keySize;
-    }
-
-    public void setKeySize(int keySize) {
-        this.keySize = keySize;
-    }
-
-    public AsymmetricAlgorithm getAlgorithm() {
-        return algorithm;
-    }
-
-    public void setAlgorithm(AsymmetricAlgorithm algorithm) {
-        this.algorithm = algorithm;
-    }
-
-    public Object getPadding() {
-        return padding;
-    }
-
-    public void setPadding(Object padding) {
-        this.padding = padding;
     }
 }

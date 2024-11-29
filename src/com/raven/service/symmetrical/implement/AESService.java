@@ -1,6 +1,6 @@
 package com.raven.service.symmetrical.implement;
 
-import com.raven.service.symmetrical.ISymmetricCipher;
+import com.raven.service.symmetrical.ISymmetricService;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Base64;
 
-public class AESService implements ISymmetricCipher {
+public class AESService implements ISymmetricService {
 
     private SecretKey key;
     private String transformation;
@@ -26,7 +26,7 @@ public class AESService implements ISymmetricCipher {
     }
 
     @Override
-    public String encryptToBase64(String text) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
 
@@ -80,7 +80,7 @@ public class AESService implements ISymmetricCipher {
 
 
     @Override
-    public String decryptFromBase64(String text) throws Exception {
+    public String decrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
 
@@ -141,6 +141,8 @@ public class AESService implements ISymmetricCipher {
             throw new Exception("Failed to import key: " + e.getMessage());
         }
     }
+
+    @Override
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
@@ -149,8 +151,8 @@ public class AESService implements ISymmetricCipher {
         AESService aesService = new AESService();
         aesService.setTransformation("AES/CBC/PKCS5Padding");
         aesService.generateSecretKey(128);
-        String encrypt_text = aesService.encryptToBase64(plain_text);
-        String decrypted_text = aesService.decryptFromBase64(encrypt_text);
+        String encrypt_text = aesService.encrypt(plain_text);
+        String decrypted_text = aesService.decrypt(encrypt_text);
         System.out.println("Key: " + aesService.exportKey());
         System.out.println("Encrypted Text: " + encrypt_text);
         System.out.println("Decrypted Text: " + decrypted_text);

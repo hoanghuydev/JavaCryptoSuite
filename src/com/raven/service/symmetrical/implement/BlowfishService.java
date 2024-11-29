@@ -1,6 +1,6 @@
 package com.raven.service.symmetrical.implement;
 
-import com.raven.service.symmetrical.ISymmetricCipher;
+import com.raven.service.symmetrical.ISymmetricService;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Base64;
 
-public class BlowfishService implements ISymmetricCipher {
+public class BlowfishService implements ISymmetricService {
     private SecretKey key;
     private String transformation;
 
@@ -25,7 +25,7 @@ public class BlowfishService implements ISymmetricCipher {
     }
 
     @Override
-    public String encryptToBase64(String text) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
 
@@ -76,7 +76,7 @@ public class BlowfishService implements ISymmetricCipher {
     }
 
     @Override
-    public String decryptFromBase64(String text) throws Exception {
+    public String decrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
 
@@ -152,16 +152,18 @@ public class BlowfishService implements ISymmetricCipher {
         }
     }
 
+    @Override
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
+
     public static void main(String[] args) throws Exception {
         String plain_text = "Thử mã hoá Blowfish";
         BlowfishService blowFish = new BlowfishService();
         blowFish.setTransformation("Blowfish/CBC/PKCS5Padding");
         blowFish.generateSecretKey(128);
-        String encrypted_text = blowFish.encryptToBase64(plain_text);
-        String decrypted_text = blowFish.decryptFromBase64(encrypted_text);
+        String encrypted_text = blowFish.encrypt(plain_text);
+        String decrypted_text = blowFish.decrypt(encrypted_text);
         System.out.println("Key: " + blowFish.exportKey());
         System.out.println("Encrypted : " + encrypted_text);
         System.out.println("Decrypted : " + decrypted_text);

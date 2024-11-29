@@ -1,6 +1,6 @@
 package com.raven.service.symmetrical.implement;
 
-import com.raven.service.symmetrical.ISymmetricCipher;
+import com.raven.service.symmetrical.ISymmetricService;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -12,7 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Base64;
 
-public class DESService implements ISymmetricCipher {
+public class DESService implements ISymmetricService {
     private SecretKey key;
     private String transformation;
 
@@ -25,7 +25,7 @@ public class DESService implements ISymmetricCipher {
     }
 
     @Override
-    public String encryptToBase64(String text) throws Exception {
+    public String encrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
 
@@ -69,7 +69,7 @@ public class DESService implements ISymmetricCipher {
     }
 
     @Override
-    public String decryptFromBase64(String text) throws Exception {
+    public String decrypt(String text) throws Exception {
         if (key == null) return "";
         Cipher cipher = Cipher.getInstance(transformation);
 
@@ -132,6 +132,7 @@ public class DESService implements ISymmetricCipher {
         }
     }
 
+    @Override
     public void setTransformation(String transformation) {
         this.transformation = transformation;
     }
@@ -141,10 +142,10 @@ public class DESService implements ISymmetricCipher {
         DESService des = new DESService();
         des.setTransformation("DES/CBC/PKCS5Padding");
         des.generateSecretKey(56);
-        String encrypt_text = des.encryptToBase64(plain_text);
+        String encrypt_text = des.encrypt(plain_text);
         System.out.println("Key: " + des.exportKey());
         System.out.println("Encrypt To Base64: " + encrypt_text);
-        System.out.println(des.decryptFromBase64(encrypt_text));
+        System.out.println(des.decrypt(encrypt_text));
         String srcFileEncrypt = "E:\\Dowload\\testMaHoa.json";
         String destFileEncrypt = "E:\\Dowload\\testDaMaHoa.json";
         String destFileDecrypt = "E:\\Dowload\\testDaGiai.json";
