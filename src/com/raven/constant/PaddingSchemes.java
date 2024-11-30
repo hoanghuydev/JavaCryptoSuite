@@ -10,4 +10,8 @@ public class PaddingSchemes {
     public static final String OAEPWithSHA256AndMGF1Padding = "OAEPWithSHA256AndMGF1Padding";
     public static final String ECDSA = "ECDSA";
     public static final String ECDH = "ECDH";
+    public static final String SHA256withRSA = "SHA256withRSA";
+    public static final String SHA1withDSA = "SHA1withDSA";
+    public static final String SHA256withECDSA = "SHA256withECDSA";
+
 }

@@ -6,7 +6,7 @@ public class CipherTypes {
     };
 
     public static final String[] ASYMMETRIC_CIPHERS = {
-            CipherAlgorithms.RSA, CipherAlgorithms.ECC
+            CipherAlgorithms.RSA, CipherAlgorithms.EC
     };
 
     public static final String[] BASIC_CIPHERS = {
@@ -15,5 +15,10 @@ public class CipherTypes {
 
     public static final String[] HASH_CIPHERS = {
             CipherAlgorithms.BCRYPT, CipherAlgorithms.MD5, CipherAlgorithms.SHA256
+    };
+    public static final String[] SIGN_CIPHERS = {
+            "SHA256withRSA",
+            "SHA1withDSA",
+            "SHA256withECDSA"
     };
 }

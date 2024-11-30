@@ -118,7 +118,7 @@ public class ControlPanel extends JPanel {
             case CipherAlgorithms.RSA:
                 controller.setCipher(new RSAService());
                 break;
-                case CipherAlgorithms.ECC:
+                case CipherAlgorithms.EC:
                 controller.setCipher(new ECCService());
                 break;
             default:

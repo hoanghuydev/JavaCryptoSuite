@@ -14,7 +14,7 @@ public class CipherAlgorithms {
     public static final String SERPENT = "Serpent";
     public static final String TWOFISH = "Twofish";
     public static final String RSA = "RSA";
-    public static final String ECC = "ECC";
+    public static final String EC = "EC";
     public static final String BCRYPT = "Bcrypt";
     public static final String DSA = "DSA";
 }

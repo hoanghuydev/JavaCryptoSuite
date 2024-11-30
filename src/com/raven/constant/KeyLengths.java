@@ -1,7 +1,5 @@
 package com.raven.constant;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class KeyLengths {
@@ -19,7 +17,7 @@ public class KeyLengths {
             CipherAlgorithms.SERPENT, SERPENT_KEY_LENGTHS,
             CipherAlgorithms.TWOFISH, TWOFISH_KEY_LENGTHS,
             CipherAlgorithms.RSA, RSA_KEY_LENGTHS,
-            CipherAlgorithms.ECC, ECC_KEY_LENGTHS
+            CipherAlgorithms.EC, ECC_KEY_LENGTHS
     );
     public static int[] getKeyLengths(String algorithm) {
         return ALGORITHM_KEY_LENGTHS.getOrDefault(algorithm, new int[0]);

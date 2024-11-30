@@ -11,7 +11,6 @@ public interface IFileEncryptable {
     default void chooseFile() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Select file to execute");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("All Files", "*"));
         int result = fileChooser.showOpenDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             setInputFile(fileChooser.getSelectedFile());

@@ -23,8 +23,8 @@ public class KeyPanel extends JPanel {
         // Panel cho tiêu đề và các nút
         JPanel publicKeyHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel publicKeyLabel = new Label("Public Key", "🔓");
-        JButton importPublicKeyBtn = new SmallButton("⬇️", "Import Public Key", e -> controller.importKeys(true));
-        JButton exportPublicKeyBtn = new SmallButton("⬆️", "Export Public Key", e -> controller.exportKeys(true));
+        JButton importPublicKeyBtn = new SmallButton("📂", "Import Public Key", e -> controller.importKeys(true));
+        JButton exportPublicKeyBtn = new SmallButton("💾", "Export Public Key", e -> controller.exportKeys(true));
 
         publicKeyHeaderPanel.add(publicKeyLabel);
         publicKeyHeaderPanel.add(Box.createHorizontalStrut(10));
@@ -43,8 +43,8 @@ public class KeyPanel extends JPanel {
         // Panel cho tiêu đề và các nút
         JPanel privateKeyHeaderPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel privateKeyLabel = new Label("Private Key", "🔒");
-        JButton importPrivateKeyBtn = new SmallButton("⬇️", "Import Private Key", e -> controller.importKeys(false));
-        JButton exportPrivateKeyBtn = new SmallButton("⬆️", "Export Private Key", e -> controller.exportKeys(false));
+        JButton importPrivateKeyBtn = new SmallButton("📂", "Import Private Key", e -> controller.importKeys(false));
+        JButton exportPrivateKeyBtn = new SmallButton("💾", "Export Private Key", e -> controller.exportKeys(false));
 
         privateKeyHeaderPanel.add(privateKeyLabel);
         privateKeyHeaderPanel.add(Box.createHorizontalStrut(10));

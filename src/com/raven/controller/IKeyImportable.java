@@ -16,11 +16,20 @@ public interface IKeyImportable {
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
-                String content = reader.lines().reduce("", (a, b) -> a + b + "\n");
+                StringBuilder content = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");  // Only add a newline if there's more content
+                }
+                // Remove the last newline if it exists
+                if (content.length() > 0 && content.charAt(content.length() - 1) == '\n') {
+                    content.deleteCharAt(content.length() - 1);
+                }
+
                 if (isPublic) {
-                    getPublicKeyArea().setText(content);
+                    getPublicKeyArea().setText(content.toString());
                 } else {
-                    getPrivateKeyArea().setText(content);
+                    getPrivateKeyArea().setText(content.toString());
                 }
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Error importing key: " + ex.getMessage(),
